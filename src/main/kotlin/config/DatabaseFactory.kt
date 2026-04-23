@@ -15,6 +15,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 object DatabaseFactory {
 
     fun init(environment: ApplicationEnvironment) {
+        environment.log.info("DatabaseFactory init: ENV-BASED CONFIG VERSION")
+
         val jdbcUrl = System.getenv("DATABASE_URL")
             ?: error("DATABASE_URL is not set")
 
@@ -37,8 +39,6 @@ object DatabaseFactory {
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
             validate()
         }
-
-        environment.log.info("DatabaseFactory init: ENV-BASED CONFIG VERSION")
 
         environment.log.info("DB URL present: ${hikariConfig.jdbcUrl.isNotBlank()}")
         environment.log.info("DB USER present: ${hikariConfig.username.isNotBlank()}")
