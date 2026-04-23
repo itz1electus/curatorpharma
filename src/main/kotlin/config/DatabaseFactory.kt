@@ -15,19 +15,29 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 object DatabaseFactory {
 
     fun init(environment: ApplicationEnvironment) {
-        environment.log.info("DatabaseFactory init: ENV-BASED CONFIG VERSION")
+        environment.log.info("DatabaseFactory init: JDBC URL FROM PG* VARIABLES")
 
-        val jdbcUrl = System.getenv("DATABASE_URL")
-            ?: error("DATABASE_URL is not set")
+        val host = System.getenv("PGHOST")
+            ?: error("PGHOST is not set")
 
-        val username = System.getenv("DB_USER")
-            ?: error("DB_USER is not set")
+        val port = System.getenv("PGPORT")
+            ?: "5432"
 
-        val password = System.getenv("DB_PASSWORD")
-            ?: error("DB_PASSWORD is not set")
+        val database = System.getenv("PGDATABASE")
+            ?: error("PGDATABASE is not set")
 
-        val driverClassName = System.getenv("DB_DRIVER") ?: "org.postgresql.Driver"
+        val username = System.getenv("PGUSER")
+            ?: System.getenv("DB_USER")
+            ?: error("PGUSER/DB_USER is not set")
+
+        val password = System.getenv("PGPASSWORD")
+            ?: System.getenv("DB_PASSWORD")
+            ?: error("PGPASSWORD/DB_PASSWORD is not set")
+
+        val driverClassName = "org.postgresql.Driver"
         val maximumPoolSize = System.getenv("DB_MAX_POOL_SIZE")?.toIntOrNull() ?: 10
+
+        val jdbcUrl = "jdbc:postgresql://$host:$port/$database"
 
         val hikariConfig = HikariConfig().apply {
             this.jdbcUrl = jdbcUrl
@@ -40,7 +50,7 @@ object DatabaseFactory {
             validate()
         }
 
-        environment.log.info("DB URL present: ${hikariConfig.jdbcUrl.isNotBlank()}")
+        environment.log.info("JDBC URL: $jdbcUrl")
         environment.log.info("DB USER present: ${hikariConfig.username.isNotBlank()}")
 
         val dataSource = HikariDataSource(hikariConfig)
