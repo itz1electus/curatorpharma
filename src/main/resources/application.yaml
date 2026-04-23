@@ -1,0 +1,14 @@
+ktor:
+    application:
+        modules:
+            - ng.mustafa.ApplicationKt.module
+    deployment:
+        host: 0.0.0.0
+        port: 8080
+
+database:
+    jdbcUrl: ${?DATABASE_URL}
+    driverClassName: "org.postgresql.Driver"
+    username: ${?DB_USER}
+    password: ${?DB_PASSWORD}
+    maximumPoolSize: 10

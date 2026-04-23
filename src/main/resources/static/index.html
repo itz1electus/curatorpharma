@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ktor Pharma Backend Test</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<main class="container">
+    <h1>Curator Pharma Backend Test Console</h1>
+
+    <section class="card">
+        <h2>Catalog</h2>
+        <button onclick="loadCatalog()">Load Catalog</button>
+        <pre id="catalogOutput"></pre>
+    </section>
+
+    <section class="card">
+        <h2>Product Detail</h2>
+        <input id="productIdInput" value="prod_amoxicillin_500mg" />
+        <button onclick="loadProduct()">Load Product</button>
+        <pre id="productOutput"></pre>
+    </section>
+
+    <section class="card">
+        <h2>Add Cart Item</h2>
+        <input id="addProductId" value="prod_amoxicillin_500mg" placeholder="productId" />
+        <input id="addQuantity" type="number" value="12" placeholder="quantity" />
+        <input id="addUnit" value="CASE" placeholder="unitOfMeasure" />
+        <button onclick="addCartItem()">Add To Cart</button>
+    </section>
+
+    <section class="card">
+        <h2>Cart</h2>
+        <button onclick="loadCart()">Load Cart</button>
+        <pre id="cartOutput"></pre>
+    </section>
+
+    <section class="card">
+        <h2>Update Cart Item</h2>
+        <input id="updateItemId" placeholder="cart itemId" />
+        <input id="updateQuantity" type="number" value="20" placeholder="quantity" />
+        <button onclick="updateCartItem()">Update Item</button>
+    </section>
+
+    <section class="card">
+        <h2>Delete Cart Item</h2>
+        <input id="deleteItemId" placeholder="cart itemId" />
+        <button onclick="deleteCartItem()">Delete Item</button>
+    </section>
+
+    <section class="card">
+        <h2>Checkout</h2>
+        <button onclick="checkout()">Checkout</button>
+        <pre id="checkoutOutput"></pre>
+    </section>
+
+    <section class="card">
+        <h2>Load Order</h2>
+        <input id="orderIdInput" placeholder="orderId" />
+        <button onclick="loadOrder()">Load Order</button>
+        <pre id="orderOutput"></pre>
+    </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

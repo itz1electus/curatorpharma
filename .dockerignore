@@ -1,0 +1,41 @@
+# Gradle build artifacts and cache
+.gradle
+.gradle-local/
+build
+
+# IDE files
+.idea
+*.iml
+
+# Version control
+.git
+.gitignore
+
+# Local configuration
+local.properties
+
+# Kotlin compiler cache
+.kotlin/
+
+# OS-specific files
+.DS_Store
+
+# Gradle wrapper JAR (will be downloaded during build if needed)
+gradle/wrapper/gradle-wrapper.jar
+
+# Log files
+*.log
+
+# Editor temporary files
+*.swp
+*~
+
+# Docker files
+.dockerignore
+Dockerfile*
+
+# Documentation
+README.md
+
+# Deployment configuration
+railway.toml
