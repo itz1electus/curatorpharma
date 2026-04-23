@@ -15,6 +15,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 object DatabaseFactory {
 
     fun init(environment: ApplicationEnvironment) {
+        environment.log.info("DatabaseFactory init: ENV-BASED CONFIG VERSION")
+
         val jdbcUrl = System.getenv("DATABASE_URL")
             ?: error("DATABASE_URL is not set")
 
