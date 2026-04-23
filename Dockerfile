@@ -1,4 +1,4 @@
-FROM gradle:8.13.2-jdk21 AS build
+FROM gradle:jdk21 AS build
 WORKDIR /app
 
 COPY . .
