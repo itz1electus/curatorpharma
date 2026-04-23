@@ -1,11 +1,11 @@
-FROM gradle:jdk21 AS build
+FROM gradle:jdk25 AS build
 WORKDIR /app
 
 COPY . .
 
 RUN gradle buildFatJar --no-daemon
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 COPY --from=build /app/build/libs/*-all.jar app.jar
