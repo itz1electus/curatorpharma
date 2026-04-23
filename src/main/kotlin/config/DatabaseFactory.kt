@@ -57,6 +57,10 @@ object DatabaseFactory {
         Database.connect(dataSource)
 
         transaction {
+            exec("""CREATE SCHEMA IF NOT EXISTS catalog""")
+        }
+
+        transaction {
             SchemaUtils.createMissingTablesAndColumns(
                 ProductsTable,
                 CartItemsTable,
