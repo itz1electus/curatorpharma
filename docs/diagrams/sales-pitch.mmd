@@ -1,0 +1,43 @@
+flowchart LR
+    classDef apps fill:#eaf1f8,stroke:#4a6fa5,stroke-width:2px,color:#1f2d3d
+    classDef platform fill:#e9f7ef,stroke:#2e8b57,stroke-width:2px,color:#14532d
+    classDef data fill:#f1ecfa,stroke:#7c5cbf,stroke-width:2px,color:#3c2a6e
+    classDef ops fill:#fdf6e3,stroke:#c9971e,stroke-width:2px,color:#6b4e00
+
+    subgraph EXPERIENCE["Customer Experience"]
+        AND["Android App"]
+        IOS["iOS App"]
+    end
+
+    GATE["Secure API Gateway<br/>Encrypted traffic<br/>Sign-in & accounts<br/>Role-based access:<br/>staff vs. buyers"]
+
+    subgraph PLATFORM["Commerce Platform"]
+        CATALOG["Product Catalog<br/>Pharma-grade detail:<br/>dosage, cold-chain, datasheets"]
+        CART["Smart Cart<br/>Live pricing, tax &<br/>shipping calculation"]
+        ORDERS["Order Management<br/>Checkout, order tracking<br/>& status updates"]
+    end
+
+    DB[("Secure Data Store<br/>PostgreSQL<br/>Every order and account<br/>change fully recorded")]
+
+    subgraph TRUST["Built-in Reliability"]
+        MON["24/7 Health Monitoring<br/>with automatic recovery"]
+        QA["Automated Quality Checks<br/>on every release"]
+        SCALE["Cloud-Hosted & Scalable<br/>containerized deployment"]
+    end
+
+    AND --> GATE
+    IOS --> GATE
+    GATE --> CATALOG
+    GATE --> CART
+    GATE --> ORDERS
+    CATALOG --> DB
+    CART --> DB
+    ORDERS --> DB
+    DB -.- MON
+    DB -.- QA
+    DB -.- SCALE
+
+    class AND,IOS apps
+    class GATE,CATALOG,CART,ORDERS platform
+    class DB data
+    class MON,QA,SCALE ops

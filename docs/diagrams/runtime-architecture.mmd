@@ -1,0 +1,89 @@
+flowchart TB
+    classDef existing fill:#eaf1f8,stroke:#4a6fa5,color:#1f2d3d
+    classDef roadmap fill:#e9f7ef,stroke:#2e8b57,stroke-width:2px,stroke-dasharray:6 4,color:#14532d
+    classDef change fill:#fdf6e3,stroke:#c9971e,color:#6b4e00
+    classDef dead fill:#f5f5f5,stroke:#9aa0a6,stroke-dasharray:2 3,color:#5f6368
+    classDef store fill:#f1ecfa,stroke:#7c5cbf,color:#3c2a6e
+
+    subgraph CLIENTS["Clients"]
+        direction LR
+        MOBILE["Android / iOS app"]
+        CONSOLE["Static test console<br/>resources/static, served at /"]
+    end
+
+    subgraph KTOR["Ktor server — Application.module()"]
+        subgraph PIPELINE["Plugin pipeline"]
+            direction LR
+            LOG["CallLogging"] --> SP["StatusPages<br/>IllegalArgument→400 · NoSuchElement→404 · else 500"] --> CN["ContentNegotiation<br/>kotlinx JSON"]
+            AUTHP["Authentication (JWT)<br/>+ RBAC route plugin (401 vs 403)"]
+        end
+
+        subgraph ROUTES["routes/ — HTTP layer"]
+            direction LR
+            HEALTH["GET /health"]
+            CAT_R["CatalogRoutes<br/>/api/v1/catalog — stays public"]
+            CART_R["CartRoutes<br/>/api/v1/cart"]
+            ORD_R["OrderRoutes<br/>/api/v1/orders"]
+            AUTH_R["AuthRoutes<br/>/api/v1/auth — signup · login"]
+        end
+
+        DEMO["DEMO_USER_ID 'user_demo_001'<br/>replace with userId from JWTPrincipal"]
+
+        subgraph SERVICES["service/ — application layer"]
+            direction LR
+            CAT_S["CatalogService"]
+            CART_S["CartService<br/>pricing + checkout logic moves here<br/>(money: Double → BigDecimal)"]
+            ORD_S["OrderService"]
+            AUTH_S["AuthService<br/>bcrypt hashing · JWT issuing · role claim"]
+        end
+
+        subgraph REPOS["repository/ interfaces → repository/exposed/ implementations"]
+            direction LR
+            CAT_I["CatalogRepository"]
+            CART_I["CartRepository<br/>currently holds business rules —<br/>slims down to pure persistence"]
+            ORD_I["OrderRepository<br/>gains createOrder (from cart checkout)"]
+            USER_I["UserRepository"]
+        end
+    end
+
+    subgraph DATA["PostgreSQL — Hikari pool via DatabaseFactory"]
+        direction LR
+        PRODUCTS[("catalog.products<br/>mapped, not seeded")]
+        CART_T[("cart_items")]
+        ORDERS_T[("orders<br/>order_items")]
+        USERS_T[("users<br/>id · email · password_hash · role")]
+    end
+
+    SCHEMA["Schema at startup:<br/>SchemaUtils.createMissingTablesAndColumns<br/>replace with Flyway migrations"]
+
+    subgraph VESTIGIAL["Dormant code — resolve during auth work"]
+        direction LR
+        ENV["config/Env.kt unused<br/>repurpose for JWT_SECRET"]
+        MON["Monitoring.kt never called<br/>delete"]
+        SEED["SeedData commented out<br/>becomes ADMIN endpoint or Flyway seed"]
+        DBG["debug products route, malformed path<br/>remove or make ADMIN-only"]
+    end
+
+    MOBILE --> PIPELINE
+    CONSOLE --> PIPELINE
+    PIPELINE --> ROUTES
+    AUTHP -. "guards" .-> CART_R
+    AUTHP -. "guards" .-> ORD_R
+    DEMO -.-> CART_R
+    DEMO -.-> ORD_R
+    CAT_R --> CAT_S --> CAT_I
+    CART_R --> CART_S --> CART_I
+    ORD_R --> ORD_S --> ORD_I
+    AUTH_R --> AUTH_S --> USER_I
+    CAT_I --> PRODUCTS
+    CART_I --> CART_T
+    CART_I -->|"checkout inserts orders today —<br/>moves to OrderRepository"| ORDERS_T
+    ORD_I --> ORDERS_T
+    USER_I --> USERS_T
+    SCHEMA -.-> DATA
+
+    class MOBILE,CONSOLE,LOG,SP,CN,HEALTH,CAT_R,CART_R,ORD_R,CAT_S,ORD_S,CAT_I,ORD_I existing
+    class AUTHP,AUTH_R,AUTH_S,USER_I,USERS_T roadmap
+    class DEMO,CART_S,CART_I,SCHEMA change
+    class ENV,MON,SEED,DBG dead
+    class PRODUCTS,CART_T,ORDERS_T store
