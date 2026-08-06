@@ -1,0 +1,33 @@
+flowchart LR
+    classDef existing fill:#eaf1f8,stroke:#4a6fa5,color:#1f2d3d
+    classDef roadmap fill:#e9f7ef,stroke:#2e8b57,stroke-width:2px,stroke-dasharray:6 4,color:#14532d
+    classDef change fill:#fdf6e3,stroke:#c9971e,color:#6b4e00
+
+    PUSH["git push to main"]
+
+    subgraph CI["GitHub Actions CI"]
+        direction TB
+        BUILD["./gradlew build<br/>+ foojay toolchain resolver<br/>(fixes 'no JDK 25' failure)"]
+        UNIT["Route & service tests<br/>against fake repositories"]
+        ITEST["Repository tests<br/>Testcontainers PostgreSQL"]
+        BUILD --> UNIT --> ITEST
+    end
+
+    subgraph RAILWAY["Railway deploy"]
+        direction TB
+        DOCKER["Dockerfile build<br/>gradle:jdk25 → temurin:25-jre<br/>add dependency layer caching"]
+        RUN["Container<br/>PGHOST · PGUSER · PGPASSWORD ·<br/>PGDATABASE · JWT_SECRET"]
+        HC["healthcheck /health<br/>restart ON_FAILURE"]
+        DOCKER --> RUN --> HC
+    end
+
+    CURTEST["Today: single ApplicationTest,<br/>fails without live DB — nothing gates deploys"]
+
+    PUSH -->|"today: straight to deploy"| RAILWAY
+    PUSH -.->|"roadmap: CI gates the deploy"| CI
+    CI -.-> RAILWAY
+    PUSH -.- CURTEST
+
+    class PUSH,RUN,HC existing
+    class CI,BUILD,UNIT,ITEST roadmap
+    class DOCKER,CURTEST change
